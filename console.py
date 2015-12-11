@@ -102,7 +102,11 @@ def main():
         password = args.password,
         verify_ssl = '/etc/ssl/certs/ca-bundle.crt')
 
-    reg.api_test()
+    try:
+        reg.api_test()
+    except dockerregv2.AuthenticationError:
+        print('Authentication error')
+        sys.exit(2)
 
     RegistryConsole(reg).cmdloop_noint()
 
