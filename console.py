@@ -25,6 +25,11 @@ class RegistryConsole(Cmd):
             except KeyboardInterrupt:
                 print()
 
+    def emptyline(self):
+        # If this method is not overridden, it repeats the last nonempty command entered.
+        return
+
+
     def do_EOF(self, line):
         return self.do_quit(line)
 
