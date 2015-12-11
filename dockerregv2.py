@@ -27,6 +27,8 @@ class RegistryError(Exception):
             message = errors[0].get('message')
         super(RegistryError, self).__init__(message)
 
+class AuthenticationError(Exception):
+    pass
 
 class Registry(object):
     def __init__(self, url, username, password, verify_ssl=False):
@@ -58,6 +60,9 @@ class Registry(object):
         params = {k:v for k,v in info.iteritems() if k != 'realm'}
         auth = HTTPBasicAuth(self.username, self.password)
         r2 = requests.get(info['realm'], params=params, auth=auth, verify=self.verify_ssl)
+
+        if r2.status_code == 401:
+            raise AuthenticationError()
         r2.raise_for_status()
 
         self.bearer_token = r2.json()['token']
