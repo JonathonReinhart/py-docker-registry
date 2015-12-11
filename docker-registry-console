@@ -9,7 +9,7 @@ import readline
 import shlex
 from pprint import pprint
 
-import docker_registry
+from docker_registry import *
 
 class RegistryConsole(Cmd):
     def __init__(self, reg):
@@ -119,7 +119,7 @@ def main():
     if not args.password:
         args.password = getpass.getpass('Password: ')
 
-    reg = docker_registry.Registry(
+    reg = Registry(
         url = args.registry_url,
         username = args.username,
         password = args.password,
@@ -127,7 +127,7 @@ def main():
 
     try:
         reg.api_test()
-    except docker_registry.AuthenticationError:
+    except AuthenticationError:
         print('Authentication error')
         sys.exit(2)
 

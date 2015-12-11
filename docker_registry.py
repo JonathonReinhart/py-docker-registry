@@ -9,6 +9,8 @@ import sys
 import requests
 from requests.auth import AuthBase, HTTPBasicAuth
 
+__all__ = ['Registry', 'RegistryError', 'AuthenticationError']
+
 class BearerAuth(AuthBase):
     def __init__(self, token):
         self.token = token
