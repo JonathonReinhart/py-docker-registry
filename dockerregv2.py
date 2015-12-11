@@ -2,11 +2,21 @@
 # References:
 #   https://github.com/kwk/docker-registry-setup#manual-token-based-workflow-to-list-repositories
 #   https://docs.docker.com/registry/spec/api
+#   http://docs.python-requests.org/en/latest/user/authentication/#new-forms-of-authentication
 
 from __future__ import print_function
 import sys
 import requests
-from requests.auth import HTTPBasicAuth
+from requests.auth import AuthBase, HTTPBasicAuth
+
+class BearerAuth(AuthBase):
+    def __init__(self, token):
+        self.token = token
+
+    def __call__(self, req):
+        req.headers['Authorization'] = 'Bearer {}'.format(self.token)
+        return req
+
 
 class RegistryError(Exception):
     def __init__(self, json):
@@ -40,7 +50,12 @@ class Registry(object):
         self.username = username
         self.password = password
         self.verify_ssl = verify_ssl
-        self.bearer_token = None
+
+        # We keep just the last-used token around, to prevent unnecessary
+        # requests both with the registry and auth server.
+        # It is yet to be seen how well this single-entry cache performs
+        # across varying scopes of API calls.
+        self.auth = None
 
     def authenticate(self):
         '''Forcefully auth for testing'''
@@ -65,26 +80,18 @@ class Registry(object):
             raise AuthenticationError()
         r2.raise_for_status()
 
-        self.bearer_token = r2.json()['token']
+        self.auth = BearerAuth(r2.json()['token'])
 
     def _do_get(self, endpoint):
         url = '{0}/v2/{1}'.format(self.url, endpoint)
-        headers = {}
 
         # Try to use previous bearer token
-        if self.bearer_token:
-            headers['Authorization'] = 'Bearer {}'.format(self.bearer_token)
-
-        r = requests.get(url, headers=headers, verify=self.verify_ssl)
+        r = requests.get(url, auth=self.auth, verify=self.verify_ssl)
 
         # If necessary, try to authenticate and try again
         if r.status_code == 401:
             self._authenticate_for(r)
-
-            assert(self.bearer_token)
-            headers['Authorization'] = 'Bearer {}'.format(self.bearer_token)
-
-            r = requests.get(url, headers=headers, verify=self.verify_ssl)
+            r = requests.get(url, auth=self.auth, verify=self.verify_ssl)
 
         json = r.json()
 
