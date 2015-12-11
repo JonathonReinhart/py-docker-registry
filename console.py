@@ -12,6 +12,7 @@ import dockerregv2
 class RegistryConsole(Cmd):
     def __init__(self, reg):
         self.reg = reg
+        self.prompt = '[{0}] Registry: '.format(reg.url.split('//')[1])
         Cmd.__init__(self)
 
     def do_EOF(self, line):
