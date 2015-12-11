@@ -10,7 +10,11 @@ from requests.auth import HTTPBasicAuth
 
 class Registry(object):
     def __init__(self, url, username, password, verify_ssl=False):
+        url = url.rstrip('/')
+        if not (url.startswith('http://') or url.startswith('https://')):
+            url = 'https://' + url
         self.url = url
+
         self.username = username
         self.password = password
         self.verify_ssl = verify_ssl
