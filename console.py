@@ -40,6 +40,21 @@ class RegistryConsole(Cmd):
         for r in catalog['repositories']:
             print('   ' + r)
 
+    def do_tags(self, line):
+        '''Get tags for a repository'''
+        if not line:
+            print('Missing repository name')
+            return
+        name = line.strip()
+
+        result = self.reg.get_tags(name)
+
+        print('{0} tags:'.format(result['name']))
+        for tag in result['tags']:
+            print('   ' + tag)
+
+
+
 
 
 def enable_requests_debugging():
