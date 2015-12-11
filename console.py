@@ -6,6 +6,8 @@ import getpass
 import logging
 from cmd import Cmd
 import readline
+import shlex
+from pprint import pprint
 
 import dockerregv2
 
@@ -55,13 +57,25 @@ class RegistryConsole(Cmd):
             print('Missing repository name')
             return
         name = line.strip()
-
         result = self.reg.get_tags(name)
 
         print('{0} tags:'.format(result['name']))
         for tag in result['tags']:
             print('   ' + tag)
 
+    def help_manifest(self):
+        print('Usage: manifest <name> <reference>')
+        print('Gets the manifest identified by <name> and <reference>,')
+        print('where <reference> can be a tag or digest.')
+
+    def do_manifest(self, line):
+        parts = shlex.split(line)
+        if len(parts) != 2:
+            print('Error: invalid arguments')
+            return
+        name, ref = parts
+
+        pprint(self.reg.get_manifest(name, ref))
 
 
 
