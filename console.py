@@ -4,8 +4,31 @@ import sys
 import argparse
 import getpass
 import logging
+from cmd import Cmd
+import readline
 
 import dockerregv2
+
+class RegistryConsole(Cmd):
+    def __init__(self, reg):
+        self.reg = reg
+        Cmd.__init__(self)
+
+    def do_EOF(self, line):
+        return self.do_quit(line)
+
+    def do_quit(self, line):
+        '''Quit the interactive console'''
+        return True
+
+    def do_catalog(self, line):
+        '''Get the registry catalog'''
+        catalog = self.reg.get_catalog()
+        print('Repositories:')
+        for r in catalog['repositories']:
+            print('   ' + r)
+
+
 
 def enable_requests_debugging():
     # http://stackoverflow.com/a/16630836
@@ -53,6 +76,8 @@ def main():
         verify_ssl = '/etc/ssl/certs/ca-bundle.crt')
 
     reg.api_test()
+
+    RegistryConsole(reg).cmdloop()
 
 if __name__ == '__main__':
     main()
