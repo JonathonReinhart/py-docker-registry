@@ -8,6 +8,26 @@ import sys
 import requests
 from requests.auth import HTTPBasicAuth
 
+class RegistryError(Exception):
+    def __init__(self, json):
+        '''Encapsulate an error response in an exception
+
+        Arguments:
+            json: the JSON data returned by the API request
+        '''
+        # Sample json data:
+        #
+        #   {u'errors': [{u'message': u'repository name not known to registry',
+        #                 u'code': u'NAME_UNKNOWN', u'detail': {u'name': u'example'}}]}
+        #
+        # For simplicity, we'll just include the first error.
+        message = 'Unknown error!'
+        errors = json.get('errors')
+        if errors:
+            message = errors[0].get('message')
+        super(RegistryError, self).__init__(message)
+
+
 class Registry(object):
     def __init__(self, url, username, password, verify_ssl=False):
         url = url.rstrip('/')
@@ -64,11 +84,10 @@ class Registry(object):
         json = r.json()
 
         if r.status_code != 200:
-            print('Error: {0}'.format(json), file=sys.stderr)
-            print('Headers: {0}'.format(r.headers), file=sys.stderr)
-            r.raise_for_status()
+            #print('Error: {0}'.format(json), file=sys.stderr)
+            raise RegistryError(json)
 
-        return r.json()
+        return json
 
     def get_tags(self, name):
         endpoint = name + '/tags/list'
