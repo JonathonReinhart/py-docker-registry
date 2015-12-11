@@ -45,8 +45,12 @@ class RegistryConsole(Cmd):
         for r in catalog['repositories']:
             print('   ' + r)
 
+
+    def help_tags(self):
+        print('Usage: tags <name>')
+        print('Lists the tags for the repository identified by <name>')
+
     def do_tags(self, line):
-        '''Get tags for a repository'''
         if not line:
             print('Missing repository name')
             return
