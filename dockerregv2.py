@@ -102,7 +102,11 @@ class Registry(object):
         return json
 
     def get_tags(self, name):
-        endpoint = name + '/tags/list'
+        endpoint = '{name}/tags/list'.format(name=name)
+        return self._do_get(endpoint)
+
+    def get_manifest(self, name, ref):
+        endpoint = '{name}/manifests/{ref}'.format(name=name, ref=ref)
         return self._do_get(endpoint)
 
     def get_catalog(self):
