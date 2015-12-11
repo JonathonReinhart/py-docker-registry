@@ -15,11 +15,22 @@ class RegistryConsole(Cmd):
         self.prompt = '[{0}] Registry: '.format(reg.url.split('//')[1])
         Cmd.__init__(self)
 
+    def cmdloop_noint(self):
+        intro = self.intro
+        while True:
+            try:
+                r = self.cmdloop(intro)
+                intro = None    # only print once
+                break
+            except KeyboardInterrupt:
+                print()
+
     def do_EOF(self, line):
         return self.do_quit(line)
 
     def do_quit(self, line):
         '''Quit the interactive console'''
+        print()
         return True
 
     def do_catalog(self, line):
@@ -78,7 +89,7 @@ def main():
 
     reg.api_test()
 
-    RegistryConsole(reg).cmdloop()
+    RegistryConsole(reg).cmdloop_noint()
 
 if __name__ == '__main__':
     main()
