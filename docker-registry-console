@@ -123,7 +123,7 @@ def main():
         url = args.registry_url,
         username = args.username,
         password = args.password,
-        verify_ssl = '/etc/ssl/certs/ca-bundle.crt')
+        verify_ssl = True)
 
     try:
         reg.api_test()
