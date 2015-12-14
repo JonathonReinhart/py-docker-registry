@@ -74,7 +74,7 @@ class Registry(object):
         info = {k:v.strip('"') for k,v in (i.split('=') for i in params.split(','))}
 
         # Request a token from the auth server
-        params = {k:v for k,v in info.iteritems() if k != 'realm'}
+        params = {k:v for k,v in info.iteritems() if k in ('service','scope')}
         auth = HTTPBasicAuth(self.username, self.password)
         r2 = requests.get(info['realm'], params=params, auth=auth, verify=self.verify_ssl)
 
