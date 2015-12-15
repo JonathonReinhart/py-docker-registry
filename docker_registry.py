@@ -21,23 +21,32 @@ class BearerAuth(AuthBase):
 
 
 class RegistryError(Exception):
-    def __init__(self, json):
+    def __init__(self, message, code=None, detail=None):
+        super(RegistryError, self).__init__(message)
+        self.code = code
+        self.detail = detail
+
+    @classmethod
+    def from_json(cls, json):
         '''Encapsulate an error response in an exception
 
         Arguments:
             json: the JSON data returned by the API request
         '''
-        # Sample json data:
-        #
-        #   {u'errors': [{u'message': u'repository name not known to registry',
-        #                 u'code': u'NAME_UNKNOWN', u'detail': {u'name': u'example'}}]}
-        #
-        # For simplicity, we'll just include the first error.
-        message = 'Unknown error!'
         errors = json.get('errors')
-        if errors:
-            message = errors[0].get('message')
-        super(RegistryError, self).__init__(message)
+        if not errors or len(errors) == 0:
+            return cls('Unknown error!')
+
+        # For simplicity, we'll just include the first error.
+        err = errors[0]
+        return cls(
+            message = err.get('message'),
+            code = err.get('code'),
+            detail = err.get('detail'),
+        )
+
+
+
 
 class AuthenticationError(Exception):
     pass
@@ -98,8 +107,7 @@ class Registry(object):
         json = r.json()
 
         if r.status_code != 200:
-            #print('Error: {0}'.format(json), file=sys.stderr)
-            raise RegistryError(json)
+            raise RegistryError.from_json(json)
 
         return json
 
