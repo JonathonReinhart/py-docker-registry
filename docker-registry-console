@@ -57,7 +57,12 @@ class RegistryConsole(Cmd):
             print('Missing repository name')
             return
         name = line.strip()
-        result = self.reg.get_tags(name)
+
+        try:
+            result = self.reg.get_tags(name)
+        except RegistryError as re:
+            print('Error: [{0}] {1}'.format(re.code, re))
+            return
 
         print('{0} tags:'.format(result['name']))
         for tag in result['tags']:
