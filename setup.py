@@ -1,7 +1,7 @@
 from distutils.core import setup
 setup(
     name = 'py-docker-registry',
-    version = '0.0.1',
+    version = '0.0.1a0',
     install_requires = [
         'requests',
     ],

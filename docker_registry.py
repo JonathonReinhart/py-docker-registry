@@ -9,6 +9,8 @@ import sys
 import requests
 from requests.auth import AuthBase, HTTPBasicAuth
 
+__version__ = '0.0.1a0'
+
 __all__ = ['Registry', 'RegistryError', 'AuthenticationError']
 
 class BearerAuth(AuthBase):
