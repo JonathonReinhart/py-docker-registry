@@ -112,7 +112,7 @@ class Registry(object):
         return self._do_get(endpoint)
 
     def get_catalog(self):
-        return self._do_get('/_catalog')
+        return self._do_get('_catalog')
 
     def api_test(self):
-        return self._do_get('/')
+        return self._do_get('')
